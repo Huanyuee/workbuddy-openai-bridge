@@ -13,6 +13,34 @@ workbuddy-openai-bridge ──► copilot.tencent.com
         └── credentials come from the WorkBuddy desktop app sign-in
 ```
 
+## Sharing with a friend
+
+Just send the repository URL: **https://github.com/Huanyuee/workbuddy-openai-bridge**
+
+They need the **same prerequisites** — this is the part most easily missed, so
+state it up front:
+
+- They must have **installed and signed in** to the WorkBuddy desktop app (or
+  WorkBuddy AI) themselves. This tool reuses the **local** app sign-in; it cannot
+  borrow your account or your credit.
+- Node.js ≥ 22.5
+
+Then, by scenario:
+
+```sh
+# using Pi
+pi install git:https://github.com/Huanyuee/workbuddy-openai-bridge
+
+# using MolaGPT
+npm install -g github:Huanyuee/workbuddy-openai-bridge
+workbuddy-bridge                     # keep running in another window
+# add the provider in MolaGPT: https://localhost:9443/v1
+workbuddy-setup-molagpt --apply
+```
+
+When you share the link, add one line: **this is for people who already have
+WorkBuddy installed** — otherwise they may expect it to use your credit.
+
 ## Requirements
 
 1. **WorkBuddy (or WorkBuddy AI) desktop app installed and signed in once**
@@ -23,6 +51,21 @@ workbuddy-openai-bridge ──► copilot.tencent.com
 
 ## Install
 
+> **Not published to npm yet.** The `npm:` forms below work only after a
+> release; use the GitHub source meanwhile (verified working).
+
+### From GitHub (available now)
+
+```sh
+# global commands (workbuddy-bridge / workbuddy-cert / workbuddy-setup-molagpt)
+npm install -g github:Huanyuee/workbuddy-openai-bridge
+
+# or as a project dependency
+npm install github:Huanyuee/workbuddy-openai-bridge
+```
+
+### From npm (after a release)
+
 ```sh
 npm install -g workbuddy-openai-bridge
 ```
@@ -30,6 +73,10 @@ npm install -g workbuddy-openai-bridge
 ## Usage 1: Pi extension (recommended)
 
 ```sh
+# available now
+pi install git:https://github.com/Huanyuee/workbuddy-openai-bridge
+
+# once published to npm
 pi install npm:workbuddy-openai-bridge
 ```
 

@@ -12,6 +12,32 @@ workbuddy-openai-bridge ──► copilot.tencent.com
         └── 凭据来自 WorkBuddy 桌面 App 登录态
 ```
 
+## 分享给朋友
+
+把仓库地址发过去即可：**https://github.com/Huanyuee/workbuddy-openai-bridge**
+
+对方需要满足**同样的前置条件**——这点最容易漏掉，务必先讲清楚：
+
+- 自己**已安装并登录** WorkBuddy 桌面 App（或国际版 WorkBuddy AI）——
+  本工具复用**本机** App 的登录态，**不能借用你的账号或额度**
+- Node.js ≥ 22.5
+
+然后按各自的场景选一条：
+
+```sh
+# 用 Pi 的
+pi install git:https://github.com/Huanyuee/workbuddy-openai-bridge
+
+# 用 MolaGPT 的
+npm install -g github:Huanyuee/workbuddy-openai-bridge
+workbuddy-bridge                     # 另开一个窗口保持运行
+# 在 MolaGPT 里添加服务商：https://localhost:9443/v1
+workbuddy-setup-molagpt --apply
+```
+
+发仓库链接时建议附一句：**这是给已装 WorkBuddy 的人用的**，
+否则对方会以为能直接用你的 WorkBuddy 额度。
+
 ## 前置条件
 
 1. **已安装并登录 WorkBuddy 桌面 App**（或国际版 WorkBuddy AI）
@@ -22,19 +48,32 @@ workbuddy-openai-bridge ──► copilot.tencent.com
 
 ## 安装
 
+> **尚未发布到 npm。** 下面的 `npm:` 形式要等发布后才可用；
+> 现在请用 GitHub 源（已实测可用）。
+
+### 从 GitHub 安装（当前可用）
+
 ```sh
-npm install -g workbuddy-openai-bridge
+# 全局命令（workbuddy-bridge / workbuddy-cert / workbuddy-setup-molagpt）
+npm install -g github:Huanyuee/workbuddy-openai-bridge
+
+# 作为项目依赖
+npm install github:Huanyuee/workbuddy-openai-bridge
 ```
 
-或作为依赖装进项目：
+### 从 npm 安装（发布后）
 
 ```sh
-npm install workbuddy-openai-bridge
+npm install -g workbuddy-openai-bridge
 ```
 
 ## 用法一：Pi 扩展（推荐）
 
 ```sh
+# 当前可用
+pi install git:https://github.com/Huanyuee/workbuddy-openai-bridge
+
+# 发布到 npm 之后
 pi install npm:workbuddy-openai-bridge
 ```
 
