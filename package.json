@@ -1,0 +1,67 @@
+{
+  "name": "workbuddy-openai-bridge",
+  "version": "1.0.0",
+  "description": "Turn a WorkBuddy desktop app sign-in into a standard OpenAI-compatible endpoint, and expose those models to Pi (pi-coding-agent) and MolaGPT.",
+  "keywords": [
+    "workbuddy",
+    "codebuddy",
+    "deepseek-harness",
+    "dsh",
+    "openai-compatible",
+    "pi-coding-agent",
+    "molagpt",
+    "bridge",
+    "proxy"
+  ],
+  "license": "MIT",
+  "author": "Huanyuee",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Huanyuee/workbuddy-openai-bridge.git"
+  },
+  "homepage": "https://github.com/Huanyuee/workbuddy-openai-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/Huanyuee/workbuddy-openai-bridge/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "bin": {
+    "workbuddy-bridge": "bin/bridge.js",
+    "workbuddy-setup-molagpt": "bin/setup-molagpt.js",
+    "workbuddy-cert": "bin/cert.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./extension": "./extensions/workbuddy.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "extensions",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "dsh-workbuddy-connect": "0.7.1"
+  },
+  "optionalDependencies": {
+    "selfsigned": "^5.5.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "start": "node bin/bridge.js",
+    "doctor": "node bin/bridge.js --doctor"
+  }
+}

@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# This package's own runtime state: a cached credential copy and TLS material.
+# Both are machine-specific and one of them is secret.
+.state/
+tls/
+.workbuddy-openai-bridge/
+*.pfx
+bridge-key.pem
+bridge-cert.pem
+bridge-cert.json
+
+# Logs and local run artifacts
+*.log
+*.pid
+relay-stdout.log
+bridge-stdout.log
+
+# Packed tarballs
+*.tgz
+
+# Editors and OS noise
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store

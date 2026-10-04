@@ -1,0 +1,14 @@
+# Normalize line endings so the repository stays consistent across platforms.
+#
+# Shell scripts and binaries must keep their bytes exactly; text files are
+# normalized to LF in the repository, which is what npm and editors expect.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pfx binary
+*.cer binary
+*.crt binary
