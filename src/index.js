@@ -3,6 +3,7 @@ export {
   createBridgeServer,
   resolveVariant,
   findElectronBinary,
+  resolveElectronBinary,
   defaultElectronCandidates,
   defaultStateDir,
   findManagedCertificate,

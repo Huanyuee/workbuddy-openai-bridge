@@ -55,12 +55,39 @@ export function defaultElectronCandidates(variant = CN_VARIANT) {
   ];
 }
 
-/** First existing candidate, or undefined. */
-export function findElectronBinary(variant = CN_VARIANT) {
+/**
+ * Resolve the WorkBuddy Electron binary, reporting how and why.
+ *
+ * An explicitly configured path is authoritative: if the user (or a host app)
+ * names a binary, an unusable path is an error rather than a reason to go
+ * looking for a different one. Silently substituting another app would mean
+ * decrypting with the wrong product's key and reporting a confusing failure
+ * far from the actual mistake.
+ *
+ * @returns {{ path?: string, source: "env" | "detected", invalidEnv?: string }}
+ */
+export function resolveElectronBinary(variant = CN_VARIANT) {
   const envName = variant === AI_VARIANT ? "WORKBUDDY_AI_ELECTRON_BIN" : "WORKBUDDY_ELECTRON_BIN";
-  const fromEnv = process.env[envName] ?? process.env.WORKBUDDY_ELECTRON_BIN;
-  if (fromEnv && fs.existsSync(fromEnv)) return fromEnv;
-  return defaultElectronCandidates(variant).find((candidate) => fs.existsSync(candidate));
+  const fromEnv = process.env[envName]?.trim();
+  if (fromEnv !== undefined && fromEnv !== "") {
+    // Deliberately no fallback to the other product's variable: pointing the
+    // AI variant at the CN binary is a mismatch, not a default.
+    if (fs.existsSync(fromEnv)) return { path: fromEnv, source: "env" };
+    return { source: "env", invalidEnv: fromEnv };
+  }
+  const detected = defaultElectronCandidates(variant).find((candidate) => fs.existsSync(candidate));
+  return detected === undefined ? { source: "detected" } : { path: detected, source: "detected" };
+}
+
+/**
+ * Convenience wrapper returning just the path.
+ *
+ * Returns undefined both when nothing was configured and when a configured path
+ * was unusable; use {@link resolveElectronBinary} when the distinction matters
+ * (diagnostics and error messages).
+ */
+export function findElectronBinary(variant = CN_VARIANT) {
+  return resolveElectronBinary(variant).path;
 }
 
 /**
@@ -153,8 +180,21 @@ export function createBridgeServer(options = {}) {
 
   // Unlock encrypted desktop credentials: dsh-workbuddy-connect disables app
   // discovery unless it is told where the binary is.
-  const electronBin = options.electronBin ?? findElectronBinary(variant);
   const envName = variant === AI_VARIANT ? "WORKBUDDY_AI_ELECTRON_BIN" : "WORKBUDDY_ELECTRON_BIN";
+  const resolved = options.electronBin === undefined
+    ? resolveElectronBinary(variant)
+    : { path: options.electronBin, source: "option" };
+  const electronBin = resolved.path;
+  if (resolved.invalidEnv !== undefined) {
+    // Explicitly configured but unusable: say so instead of quietly running a
+    // different installation. The resulting decryption failure would otherwise
+    // surface far away from the actual mistake.
+    log(
+      `!! ${envName} points at a file that does not exist:\n` +
+        `   ${resolved.invalidEnv}\n` +
+        `   Fix or unset ${envName}; the bridge will not substitute another installation.`
+    );
+  }
   if (electronBin) process.env[envName] = electronBin;
 
   const client = new WorkBuddyUpstreamClient();

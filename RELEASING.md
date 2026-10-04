@@ -37,16 +37,22 @@ git config --global user.email "you@example.com"
 
 ## Publishing to npm
 
+Run the preflight check first. It covers the manifest, every `bin` and `exports`
+target, the tarball contents (refusing to ship `.state/`, `tls/`, or `.git`), and
+whether the version number is still free:
+
 ```sh
 npm login                       # once per machine
-npm whoami                      # confirm
+npm run preflight               # or: node scripts/prepublish-check.js
 npm publish --dry-run           # inspect exactly what would be uploaded
-npm publish --access public     # scoped names need --access public; this one does not
+npm publish                     # also runs the preflight via prepublishOnly
 ```
 
+A missing npm login is reported but does not block, so `--dry-run` stays usable
+before the first release; every other failed check does block the publish.
+
 The `files` field in `package.json` keeps the tarball to source, docs, and
-licence — `node_modules`, `.state/`, and TLS material never ship. Confirm with
-`npm publish --dry-run` before every release.
+licence — `node_modules`, `.state/`, and TLS material never ship.
 
 Afterwards:
 

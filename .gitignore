@@ -20,6 +20,13 @@ bridge-stdout.log
 # Packed tarballs
 *.tgz
 
+# Transient commit-message files (writing the message to a file avoids
+# shell-quoting problems, and this keeps it out of `git add -A`)
+.gitmsg
+.commit-msg
+.commit-msg.txt
+.git-commit-msg.txt
+
 # Editors and OS noise
 .vscode/
 .idea/

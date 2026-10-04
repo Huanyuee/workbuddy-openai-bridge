@@ -37,6 +37,26 @@ First public release.
   `--prefix ""`) to disable.
 - Support for the international **WorkBuddy AI** product via
   `--variant ai` / `WORKBUDDY_VARIANT=ai`.
+- **Publish preflight** (`npm run preflight`, also wired to `prepublishOnly`).
+  Verifies the manifest, every `bin` (including a `#!/usr/bin/env node` shebang,
+  without which the generated shims are not runnable) and `exports` target, the
+  tarball contents, and whether the version number is still free. It refuses to
+  ship a tarball containing `.state/`, `tls/`, or `.git`. A missing npm login is
+  reported but does not block, so `npm publish --dry-run` stays usable.
+
+### Fixed
+
+- `bin/cert.js` had no shebang, so the `workbuddy-cert` command would not run
+  after a global install.
+- `WORKBUDDY_ELECTRON_BIN` naming an unusable path was silently ignored and the
+  bridge fell back to another detected installation. That meant decrypting with
+  a different product's key and reporting a confusing failure far from the
+  actual mistake. An explicitly configured path is now authoritative, and an
+  unusable one is reported.
+- The extension failed to load after any real install, because
+  `dsh-workbuddy-connect` declares its entire runtime surface as
+  `peerDependencies` while `pi install` runs npm with `--omit=dev --omit=peer`.
+  The full closure is now declared explicitly.
 
 ### Security
 

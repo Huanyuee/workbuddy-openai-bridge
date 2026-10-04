@@ -95,6 +95,8 @@
   },
   "scripts": {
     "start": "node bin/bridge.js",
-    "doctor": "node bin/bridge.js --doctor"
+    "doctor": "node bin/bridge.js --doctor",
+    "preflight": "node scripts/prepublish-check.js",
+    "prepublishOnly": "node scripts/prepublish-check.js"
   }
 }

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // Certificate management for the bridge's HTTPS listener.
 //
 // Why a separate command

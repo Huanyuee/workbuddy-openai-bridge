@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   createBridgeServer,
   resolveVariant,
-  findElectronBinary,
+  resolveElectronBinary,
   defaultStateDir,
   findManagedCertificate
 } from "../src/server.js";
@@ -65,7 +65,14 @@ const modelPrefix = valueOf("--prefix", process.env.WORKBUDDY_MODEL_PREFIX ?? "w
 
 const log = (message) => process.stdout.write(`[${new Date().toTimeString().slice(0, 8)}] ${message}\n`);
 
-const electronBin = valueOf("--electron-bin", undefined) ?? findElectronBinary(variant);
+// Resolve the binary once and reuse the verdict, so --doctor and a normal run
+// cannot disagree about which installation will be used.
+const cliElectronBin = valueOf("--electron-bin", undefined);
+const electronResolution = cliElectronBin === undefined
+  ? resolveElectronBinary(variant)
+  : { path: cliElectronBin, source: "option" };
+const electronBin = electronResolution.path;
+const invalidEnvVar = variant === "workbuddy-ai" ? "WORKBUDDY_AI_ELECTRON_BIN" : "WORKBUDDY_ELECTRON_BIN";
 
 if (hasFlag("--doctor")) {
   const bridge = createBridgeServer({
@@ -76,9 +83,14 @@ if (hasFlag("--doctor")) {
     logger: () => {}
   });
   const status = await bridge.status();
+  const binaryLine = electronBin !== undefined
+    ? `${electronBin}  (${electronResolution.source === "option" ? "--electron-bin" : electronResolution.source})`
+    : electronResolution.invalidEnv !== undefined
+      ? `INVALID — ${invalidEnvVar} names a missing file: ${electronResolution.invalidEnv}`
+      : `(not found — set ${invalidEnvVar})`;
   const lines = [
     `variant        : ${variant.id} (${variant.region})`,
-    `electron binary: ${electronBin ?? "(not found — set WORKBUDDY_ELECTRON_BIN)"}`,
+    `electron binary: ${binaryLine}`,
     `credential copy: ${bridge.store.ownAuthPath()}`,
     `desktop auth   : ${bridge.store.desktopAuthPath() ?? "(none)"} [${await bridge.store.desktopAuthFormat()}]`,
     `sign-in        : ${status.state}${status.reason ? ` — ${status.reason}` : ""}`,
@@ -96,9 +108,15 @@ if (hasFlag("--doctor")) {
 }
 
 if (!electronBin) {
-  log("!! no WorkBuddy binary found; encrypted credentials cannot be unlocked.");
-  log("   set WORKBUDDY_ELECTRON_BIN to the app's executable, e.g.");
-  log("   set WORKBUDDY_ELECTRON_BIN=%LOCALAPPDATA%\\Programs\\WorkBuddy\\WorkBuddy.exe");
+  if (electronResolution.invalidEnv !== undefined) {
+    log(`!! ${invalidEnvVar} names a file that does not exist:`);
+    log(`   ${electronResolution.invalidEnv}`);
+    log("   Fix or unset it, then restart. Another installation will not be substituted.");
+  } else {
+    log("!! no WorkBuddy binary found; encrypted credentials cannot be unlocked.");
+    log(`   set ${invalidEnvVar} to the app's executable, e.g.`);
+    log("   set WORKBUDDY_ELECTRON_BIN=%LOCALAPPDATA%\\Programs\\WorkBuddy\\WorkBuddy.exe");
+  }
 }
 
 const bridge = createBridgeServer({
